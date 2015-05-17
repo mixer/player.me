@@ -62,20 +62,22 @@ func grabPaginateQuery(queries []Query) Query {
 		}
 	}
 
-	from := 0
 	// Convert pages to using `from`
 	if page, ok := query["_page"]; ok {
 		if limit, ok := query["_limit"]; ok {
-			from = page.(int) * limit.(int)
+			query["_from"] = page.(int) * limit.(int)
 		} else {
-			from = page.(int) * 10
+			query["_from"] = page.(int) * 10
 		}
+		delete(query, "_page")
+	}
+	if _, ok := query["_from"]; !ok {
+		query["_from"] = 0
 	}
 
-	return Query{
-		"_from":  from,
-		"_limit": 100,
-	}
+	query["_limit"] = 100
+
+	return query
 }
 
 type Request struct {

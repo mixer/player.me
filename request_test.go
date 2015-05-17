@@ -30,6 +30,18 @@ func TestGrabsPaginated(t *testing.T) {
 		Query{"_limit": 100, "_from": 75},
 		"Failed to grab from page with limit",
 	)
+
+	assert.Equal(t,
+		grabPaginateQuery([]Query{Query{"_from": 300}}),
+		Query{"_limit": 100, "_from": 300},
+		"Gets with default from",
+	)
+
+	assert.Equal(t,
+		grabPaginateQuery([]Query{Query{"_from": 300, "_extra": "foo"}}),
+		Query{"_limit": 100, "_from": 300, "_extra": "foo"},
+		"Passes extra",
+	)
 }
 
 func TestAddsValues(t *testing.T) {

@@ -24,7 +24,7 @@ type GameListResult struct {
 
 type GameListIterator struct {
 	Iterator
-	Results chan *Game
+	Results chan Game
 }
 
 // Returns a GameList of games from the API.
@@ -41,7 +41,7 @@ func (c *Client) GameListIterate(queries ...Query) *GameListIterator {
 	query := grabPaginateQuery(queries)
 	it := &GameListIterator{
 		Iterator: newIterator(),
-		Results:  make(chan *Game),
+		Results:  make(chan Game),
 	}
 
 	go func() {
@@ -60,7 +60,7 @@ func (c *Client) GameListIterate(queries ...Query) *GameListIterator {
 				select {
 				case <-it.Quit:
 					return
-				case it.Results <- &r:
+				case it.Results <- r:
 					// ignore
 				}
 			}
