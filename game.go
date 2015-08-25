@@ -31,35 +31,34 @@ type GameListIterator struct {
 type Direction int
 
 const (
-    Forward Direction = iota
-    Backward
+	Forward Direction = iota
+	Backward
 )
 
 func (d Direction) Next(pager Pager) int {
-		var next int
-        switch d {
-        case Forward:
-                next = pager.Limit + pager.From
-				if next >= pager.Total {
-					return -1
-				}
+	var next int
+	switch d {
+	case Forward:
+		next = pager.Limit + pager.From
+		if next >= pager.Total {
+			return -1
+		}
 
-                return next
-        case Backward:
-                if pager.Limit > pager.From {
-					next = 0
-				} else {
-					next = pager.From - pager.Limit
-				}
-				if pager.From == 0 {
-					return -1
-				}
-				return next
-        }
+		return next
+	case Backward:
+		if pager.Limit > pager.From {
+			next = 0
+		} else {
+			next = pager.From - pager.Limit
+		}
+		if pager.From == 0 {
+			return -1
+		}
+		return next
+	}
 
-        return -1
+	return -1
 }
-
 
 // Returns a GameList of games from the API.
 func (c *Client) GameList(queries ...Query) (*GameListResult, error) {
@@ -106,7 +105,6 @@ func (c *Client) GameListIterate(d Direction, queries ...Query) *GameListIterato
 				close(it.Results)
 				return
 			}
-			
 
 			// Update the _from in the pagination query to get
 			// the next page.
