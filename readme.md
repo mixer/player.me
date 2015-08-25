@@ -23,7 +23,9 @@ func main() {
 
     // Even iterate over results. This will continue requesting
     // additional pages transparently.
-    it := player.New().GameListIterate()
+    // Optionally specify the direction to go (Forward or Backward)
+    // starting from your _from value
+    it := player.New().GameListIterate(Forward)
     for game := range it.Results {
         fmt.Printf("%#v\n", game)
     }
