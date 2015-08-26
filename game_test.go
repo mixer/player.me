@@ -93,7 +93,7 @@ func TestGameListIterator(t *testing.T) {
         "results": [{ "alias": "c" }]
     }`), nil)
 
-	it := client.GameListIterate()
+	it := client.GameListIterate(Forward)
 	out := []string{}
 	for game := range it.Results {
 		out = append(out, game.Alias)

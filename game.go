@@ -25,6 +25,39 @@ type GameListResult struct {
 type GameListIterator struct {
 	Iterator
 	Results chan Game
+	reverse bool
+}
+
+type Direction int
+
+const (
+	Forward Direction = iota
+	Backward
+)
+
+func (d Direction) Next(pager Pager) int {
+	var next int
+	switch d {
+	case Forward:
+		next = pager.Limit + pager.From
+		if next >= pager.Total {
+			return -1
+		}
+
+		return next
+	case Backward:
+		if pager.Limit > pager.From {
+			next = 0
+		} else {
+			next = pager.From - pager.Limit
+		}
+		if pager.From == 0 {
+			return -1
+		}
+		return next
+	}
+
+	return -1
 }
 
 // Returns a GameList of games from the API.
@@ -37,7 +70,7 @@ func (c *Client) GameList(queries ...Query) (*GameListResult, error) {
 
 // Returns a channel of games (and errors) which can be iterated
 // over transparently, without manually dealing with pagination.
-func (c *Client) GameListIterate(queries ...Query) *GameListIterator {
+func (c *Client) GameListIterate(d Direction, queries ...Query) *GameListIterator {
 	query := grabPaginateQuery(queries)
 	it := &GameListIterator{
 		Iterator: newIterator(),
@@ -66,8 +99,9 @@ func (c *Client) GameListIterate(queries ...Query) *GameListIterator {
 			}
 
 			// Close the results and end if we're at the end.
-			next := result.Pager.Limit + result.Pager.From
-			if next >= result.Pager.Total {
+			next := d.Next(result.Pager)
+
+			if next == -1 {
 				close(it.Results)
 				return
 			}
